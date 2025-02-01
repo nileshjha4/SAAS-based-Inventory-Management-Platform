@@ -24,13 +24,13 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          cd frontend
+          cd Frontend
           npm install
 
 
       - name: Build Frontend
         run: |
-          cd frontend
+          cd Frontend
           npm run build
 
       - name: Deploy Frontend (Optional)
@@ -52,12 +52,12 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          cd backend
+          cd Backend
           npm install
 
       - name: Start Backend
         run: |
-          cd backend
+          cd Backend
           npm start
 
       - name: Deploy Backend (Optional)
