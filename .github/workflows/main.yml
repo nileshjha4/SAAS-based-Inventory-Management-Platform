@@ -9,8 +9,8 @@ on:
       - main
 
 jobs:
-  frontend:
-    name: Build & Deploy Frontend
+  deploy:
+    name: Build & Deploy Fullstack App
     runs-on: self-hosted
 
     steps:
@@ -22,43 +22,29 @@ jobs:
         with:
           node-version: 21
 
-      - name: Install Dependencies
-        run: |
-          cd Frontend
-          npm install
+      - name: Install PM2 Globally
+        run: npm install -g pm2
 
-
-      - name: Build Frontend
-        run: |
-          cd Frontend
-          npm run build
-
-      - name: Deploy Frontend (Optional)
-        run: echo "Deploy step for frontend"
-
-  backend:
-    name: Build & Deploy Backend
-    runs-on: self-hosted
-    needs: frontend
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 21
-
-      - name: Install Dependencies
+      - name: Install Backend Dependencies
         run: |
           cd Backend
           npm install
 
-      - name: Start Backend
+      - name: Start Backend with PM2
         run: |
           cd Backend
-          npm start
+          pm2 delete backend || true  # Remove existing process if running
+          pm2 start npm --name backend -- start
+          pm2 save  # Save PM2 state
 
-      - name: Deploy Backend (Optional)
-        run: echo "Deploy step for backend"
+      - name: Install Frontend Dependencies
+        run: |
+          cd Frontend
+          npm install
+
+      - name: Start Frontend with PM2
+        run: |
+          cd Frontend
+          pm2 delete frontend || true  # Remove existing process if running
+          pm2 start npm --name frontend -- start
+          pm2 save  # Save PM2 state
