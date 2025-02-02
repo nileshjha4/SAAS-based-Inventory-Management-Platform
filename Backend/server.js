@@ -11,7 +11,7 @@ const cors = require("cors");
 const path = require("path");
 
 const app = express();
-const PORT = 4600;
+const PORT = 4000;
 const HOST = "0.0.0.0";
 main();
 app.use(express.json());
