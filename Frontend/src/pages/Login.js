@@ -1,62 +1,47 @@
-// import { LockClosedIcon } from "@heroicons/react/20/solid";
-import { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import AuthContext from "../AuthContext";
+import {  useState } from "react";
+import {  useNavigate } from "react-router-dom";
+import { useAdminState } from "../store/store";
 
 function Login() {
+  const { setAdmin } = useAdminState()
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
 
-  const authContext = useContext(AuthContext);
   const navigate = useNavigate();
-
 
   const handleInputChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const authCheck = () => {
-    setTimeout(() => {
-      fetch("http://localhost:4000/api/login")
-        .then((response) => response.json())
-        .then((data) => {
-          // alert("Successfully Login");
-          localStorage.setItem("user", JSON.stringify(data));
-          authContext.signin(data._id, () => {
-            navigate("/dashboard");
-          });
-        })
-        .catch((err) => {
-          alert("Wrong credentials, Try again")
-          console.log(err);
-        });
-    }, 3000);
-  };
-
-  const loginUser = (e) => {
-    // Cannot send empty data
-    console.log(JSON.stringify(form));
-
+  const loginUser = async (e) => {
     if (form.username === "" || form.password === "") {
       alert("To login user, enter details to proceed...");
     } else {
-      fetch("http://localhost:4000/api/login", {
+      const repsone = await fetch("http://localhost:4600/login", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
         },
         body: JSON.stringify(form),
       })
-        .then((result) => {
-          console.log("User login", result);
-        })
-        .catch((error) => {
-          console.log("Something went wrong ", error);
-        });
+      const data = await repsone.json();
+      if(data?.error){
+        alert(`Some Error Happened ${data?.message}`)
+      }else{
+        if(data?.token){
+          setAdmin({
+            isLoggedIn : true,
+            token: data?.token,
+            name : data?.name
+          })
+          navigate('/all-orders')
+          return
+        }
+        alert("Token is missing")
+      }
     }
-    authCheck();
   };
 
 
@@ -105,7 +90,7 @@ function Login() {
                   required
                   className="relative block w-full rounded-t-md border-0 py-1.5 px-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   placeholder="Admin"
-                  value={form.username}
+                  value={form?.username}
                   onChange={handleInputChange}
                 />
               </div>
@@ -121,7 +106,7 @@ function Login() {
                   required
                   className="relative block w-full rounded-b-md border-0 py-1.5 px-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   placeholder="Password"
-                  value={form.password}
+                  value={form?.password}
                   onChange={handleInputChange}
                 />
               </div>

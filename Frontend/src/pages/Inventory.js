@@ -1,64 +1,27 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState } from "react";
 import AddProduct from "../components/AddProduct";
-// import AddProductQty from "../components/AddProductQty"
 import UpdateProduct from "../components/UpdateProduct";
-import AuthContext from "../AuthContext";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import {MdAddBusiness} from "react-icons/md"
-
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faEdit, faSyncAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-// import { Plus, Edit, Trash2 } from 'lucide-react';
-// import { Button } from '@/components/ui/button';
+import { GetProduct } from "../logic/get-product";
+import { useQuery } from "@tanstack/react-query";
 
 function Inventory() {
   const [showProductModal, setShowProductModal] = useState(false);
-  const [showProductQtyModal, setShowProductQtyModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [updateProduct, setUpdateProduct] = useState([]);
-  const [products, setAllProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState();
+  const [searchTerm, setSearchTerm] = useState('');
   const [updatePage, setUpdatePage] = useState(true);
-  const [stores, setAllStores] = useState([]);
 
-  const authContext = useContext(AuthContext);
-  console.log('====================================');
-  console.log(authContext);
-  console.log('====================================');
-
-  useEffect(() => {
-    fetchProductsData();
-    fetchSalesData();
-  }, [updatePage]);
 
   // Fetching Data of All Products
-  const fetchProductsData = () => {
-    fetch(`http://localhost:4000/api/product/get/all`)
-      .then((response) => response.json())
-      .then((data) => {
-        setAllProducts(data);
-      })
-      .catch((err) => console.log(err));
-  };
+  const { 
+    data: productData,  
+  } = useQuery({
+    queryFn: () => GetProduct(searchTerm),
+    queryKey: ["product", searchTerm],
+  });
 
-  // Fetching Data of Search Products
-  const fetchSearchData = () => {
-    fetch(`http://localhost:4000/api/product/search?searchTerm=${searchTerm}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setAllProducts(data);
-      })
-      .catch((err) => console.log(err));
-  };
 
-  // Fetching all stores data
-  const fetchSalesData = () => {
-    fetch(`http://localhost:4000/api/store/get/${authContext.user}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setAllStores(data);
-      });
-  };
 
   // Modal for Product ADD
   const addProductModalSetting = () => {
@@ -74,16 +37,12 @@ function Inventory() {
       handlePageUpdate();
     }
   };
-  
-  const addProductQtyModalSetting = () => {
-    setShowProductQtyModal(!showProductQtyModal);
-  };
 
   // Delete item
   const deleteItem = (id) => {
     console.log("Product ID: ", id);
-    console.log(`http://localhost:4000/api/product/delete/${id}`);
-    fetch(`http://localhost:4000/api/product/delete/${id}`)
+    console.log(`http://localhost:4600/api/product/delete/${id}`);
+    fetch(`http://localhost:4600/api/product/delete/${id}`)
       .then((response) => response.json())
       .then((data) => {
         setUpdatePage(!updatePage);
@@ -95,15 +54,17 @@ function Inventory() {
     setUpdatePage(!updatePage);
   };
 
-  // Handle Search Term
-  const handleSearchTerm = (e) => {
-    setSearchTerm(e.target.value);
-    fetchSearchData();
-  };
+  // if(isLoadingProductData){
+  //   return <div>Loading...</div>
+  // }
+
+  // if(productDataError){
+  //   return <div>Something went wrong...</div>
+  // }
 
   return (
     <div className="col-span-12 lg:col-span-10  flex justify-center">
-      <div className=" flex flex-col gap-5 w-11/12">
+      <div className=" flex flex-col gap-5">
         <div className="bg-white rounded p-3">
           <span className="font-semibold px-4">Overall Inventory</span>
           <div className=" flex flex-col md:flex-row justify-center items-center  ">
@@ -112,35 +73,13 @@ function Inventory() {
                 Total Products
               </span>
               <span className="font-semibold text-gray-600 text-base">
-                {products.length}
+                {productData?.data?.length}
               </span>
               <span className="font-thin text-gray-400 text-xs">
                 Last 7 days
               </span>
             </div>
-            <div className="flex flex-col gap-3 p-10   w-full  md:w-3/12 sm:border-y-2  md:border-x-2 md:border-y-0">
-              <span className="font-semibold text-yellow-600 text-base">
-                Stores
-              </span>
-              <div className="flex gap-8">
-                <div className="flex flex-col">
-                  <span className="font-semibold text-gray-600 text-base">
-                    {stores.length}
-                  </span>
-                  <span className="font-thin text-gray-400 text-xs">
-                    Last 7 days
-                  </span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-semibold text-gray-600 text-base">
-                    $2000
-                  </span>
-                  <span className="font-thin text-gray-400 text-xs">
-                    Revenue
-                  </span>
-                </div>
-              </div>
-            </div>
+            
             <div className="flex flex-col gap-3 p-10  w-full  md:w-3/12  sm:border-y-2 md:border-x-2 md:border-y-0">
               <span className="font-semibold text-purple-600 text-base">
                 Top Selling
@@ -194,16 +133,10 @@ function Inventory() {
             handlePageUpdate={handlePageUpdate}
           />
         )}
-        {showUpdateModal && (
+        {/* {showUpdateModal && (
           <UpdateProduct
             updateProductData={updateProduct}
             updateModalSetting={updateProductModalSetting}
-          />
-        )}
-        {/* {showProductQtyModal && (
-          <AddProductQty
-            addProductQtyModalSetting={addProductQtyModalSetting}
-            handlePageUpdate={handlePageUpdate}
           />
         )} */}
 
@@ -219,11 +152,12 @@ function Inventory() {
                   src={require("../assets/search-icon.png")}
                 />
                 <input
+                  key="search-input"
                   className="border-none outline-none focus:border-none text-xs"
                   type="text"
                   placeholder="Search here"
                   value={searchTerm}
-                  onChange={handleSearchTerm}
+                  onChange={(e)=>setSearchTerm(e.target.value)}
                 />
               </div>
             </div>
@@ -232,12 +166,11 @@ function Inventory() {
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 text-xs  rounded"
                 onClick={addProductModalSetting}
               >
-                {/* <Link to="/inventory/add-product">Add Product</Link> */}
                 Add Product
               </button>
             </div>
           </div>
-          <table className="min-w-full divide-y-2 divide-gray-200 text-sm">
+          <table className="divide-y-2 divide-gray-200 text-sm">
             <thead>
               <tr>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
@@ -268,7 +201,7 @@ function Inventory() {
             </thead>
 
             <tbody className="divide-y divide-gray-200">
-              {products.map((element, index) => {
+              {productData?.data?.map((element, index) => {
                 return (
                   <tr key={element._id}>
                     <td className="whitespace-nowrap px-4 py-2  text-gray-900">
@@ -287,7 +220,7 @@ function Inventory() {
                       {element.price}
                     </td>
                     <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                      {element.flavor}
+                      {element.flavour}
                     </td>
                     <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                       {element.description}
@@ -304,15 +237,6 @@ function Inventory() {
                           className="submit-icon"
                         />
                       </button>
-                      {/* <button 
-                        onClick={() => addProductQtyModalSetting(element)}
-                      >
-                        <MdAddBusiness 
-                          color="#5e5e5e"
-                          size="20px"
-                          className="submit-icon"
-                        />
-                      </button> */}
                       
                       <button 
                         onClick={() => deleteItem(element._id)}

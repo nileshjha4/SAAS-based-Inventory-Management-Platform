@@ -1,127 +1,152 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom"; // For getting the userId from the URL
+import React, { useState, useCallback, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Package, Loader2 } from "lucide-react";
+import { GetOrders } from "../logic/get-order";
+import OrderTable from "../components/OrderTable";
+import OrderHeader from "../components/OrderHeader";
+import { toast } from "sonner";
+import OrderFilter from "../components/OrderFilter";
+import { useLocation } from "react-router-dom";
 
-function PurchaseDetails() {
-  const [orders, setOrders] = useState([]); // Make sure orders is initialized as an array
-  const [expandedOrders, setExpandedOrders] = useState({}); // State to track expanded orders
-  const { userId } = useParams(); // Get the userId from the route parameter
+const PurchaseDetails = () => {
+    const [expandedOrders, setExpandedOrders] = useState({});
+    const [selectedOrders, setSelectedOrders] = useState([]);
+    const location = useLocation()
+    const { shopname = '', id = '' } = location.state || {};
+    const [filters, setFilters] = useState({
+        startDate: "",
+        endDate: "",
+        shopname: shopname,
+        userId: id,
+    });
 
-  useEffect(() => {
-    fetchallOrders();
-  }, []);
+    // Update filters state when date inputs change
+    const handleDateChange = (e) => {
+        const { name, value } = e.target;
+        console.log(name)
+        console.log(value)
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            [name]: value,
+        }));
+    };
 
-  // Fetch Orders by User ID
-  const fetchallOrders = () => {
-    fetch(`http://localhost:4000/api/orders/all`)
-      .then((response) => response.json())
-      .then((data) => {
-        // Check if the response data is an array before setting it to state
-        if (Array.isArray(data)) {
-          setOrders(data);
-        } else {
-          console.log("Expected an array, but got:", data);
-          setOrders([]); // Ensure orders is set to an empty array if the response is not an array
-        }
-      })
-      .catch((err) => console.log(err));
-  };
+    // Fetch orders with error handling and loading state
+    const {
+        data: ordersData,
+        isLoading: isLoadingOrdersData,
+        isError,
+        error,
+    } = useQuery({
+        queryFn: () => GetOrders(filters),
+        queryKey: ["orders", filters],
+        onError: (error) => {
+            toast.error("Failed to fetch orders", {
+                description: error.message,
+            });
+        },
+        retry: 2,
+    });
 
-  // Toggle item details visibility for an order
-  const toggleOrderDetails = (orderId) => {
-    setExpandedOrders((prevState) => ({
-      ...prevState,
-      [orderId]: !prevState[orderId],
-    }));
-  };
+    // Memoized toggle order details to prevent unnecessary re-renders
+    const toggleOrderDetails = useCallback((orderId) => {
+        setExpandedOrders((prevState) => ({
+            ...prevState,
+            [orderId]: !prevState[orderId],
+        }));
+    }, []);
 
-  return (
-    <div className="col-span-12 lg:col-span-10 flex justify-center">
-      <div className="flex flex-col gap-5 w-11/12">
-        <div className="bg-white rounded p-3">
-          <span className="font-semibold px-4">User Orders</span>
+    // Memoized checkbox handler with improved logic
+    const handleCheckboxChange = useCallback((orderId) => {
+        setSelectedOrders((prevState) =>
+            prevState.includes(orderId)
+                ? prevState.filter((id) => id !== orderId)
+                : [...prevState, orderId]
+        );
+    }, []);
+
+    // Loading state component
+    if (isLoadingOrdersData) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="text-center">
+                    <Loader2
+                        className="mx-auto mb-4 animate-spin text-blue-500"
+                        size={48}
+                    />
+                    <p className="text-gray-600">Loading orders...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Error state component
+    if (isError) {
+        return (
+            <div className="flex justify-center items-center h-screen bg-red-50">
+                <div className="text-center">
+                    <Package
+                        className="mx-auto mb-4 text-red-500"
+                        size={48}
+                    />
+                    <h2 className="text-xl font-semibold text-red-700 mb-2">
+                        Failed to Load Orders
+                    </h2>
+                    <p className="text-red-600">
+                        {error?.message || "An unexpected error occurred"}
+                    </p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                    >
+                        Retry
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    // Empty state when no orders
+    if (!ordersData?.orders?.length) {
+        return (
+            <>
+            <OrderFilter filters={filters} handleDateChange={handleDateChange} setFilters={setFilters} />
+            <div className="flex justify-center items-center h-screen bg-gray-50">
+                <div className="text-center">
+                    <Package
+                        className="mx-auto mb-4 text-gray-400"
+                        size={48}
+                    />
+                    <h2 className="text-xl font-semibold text-gray-700 mb-2">
+                        No Orders Found
+                    </h2>
+                    <p className="text-gray-600">
+                        You don't have any orders at the moment.
+                    </p>
+                </div>
+            </div>
+            </>
+        );
+    }
+
+    return (
+        <div className="container mx-auto px-4 space-y-6 w-full">
+            {/* Filters Section */}
+            <OrderFilter filters={filters} handleDateChange={handleDateChange} setFilters={setFilters} />
+
+            <div className="space-y-4 w-full">
+                <OrderHeader selectedOrders={selectedOrders} />
+
+                <OrderTable
+                    ordersData={ordersData}
+                    expandedOrders={expandedOrders}
+                    selectedOrders={selectedOrders}
+                    toggleOrderDetails={toggleOrderDetails}
+                    handleCheckboxChange={handleCheckboxChange}
+                />
+            </div>
         </div>
-
-        {/* Orders Table */}
-        <div className="overflow-x-auto rounded-lg border bg-white border-gray-200">
-          <table className="min-w-full divide-y-2 divide-gray-200 text-sm">
-            <thead>
-              <tr>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">Order ID</th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">Status</th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">Item Details</th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">Total Amount</th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">Discount</th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-gray-200">
-              {/* Ensure orders is an array before calling map */}
-              {Array.isArray(orders) && orders.length > 0 ? (
-                orders.map((order) => (
-                  <React.Fragment key={order._id}>
-                    <tr>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{order._id}</td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">{order.status}</td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        <button
-                          className="px-3 py-1 bg-blue-500 text-white rounded-lg"
-                          onClick={() => toggleOrderDetails(order._id)}
-                        >
-                          {expandedOrders[order._id] ? "Hide Details" : "View Details"}
-                        </button>
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        ₹{order.order.reduce((acc, item) => acc + parseFloat(item.sum_amt || 0), 0).toFixed(2)}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        ₹{order.order.reduce((acc, item) => acc + parseFloat(item.discount_amt || 0), 0).toFixed(2)}
-                      </td>
-                    </tr>
-
-                    {/* Expandable Item Details */}
-                    {expandedOrders[order._id] && (
-                      <tr>
-                        <td colSpan={5} className="px-4 py-2">
-                          <div className="flex flex-col gap-3">
-                            {order.order.map((item, index) => (
-                              <div
-                                key={index}
-                                className="flex justify-between items-center bg-gray-100 p-3 rounded-lg shadow-sm"
-                              >
-                                <div className="flex flex-col">
-                                  <span className="font-semibold text-gray-800">Item ID: {item.item_id}</span>
-                                  <span className="text-gray-600">Quantity: {item.qty || "N/A"}</span>
-                                  <span className="text-gray-600">Price: ₹{item.sum_amt || "N/A"}</span>
-                                </div>
-                                <div className="flex flex-col items-end">
-                                  <span className="font-semibold text-gray-800">
-                                    Discount: ₹{item.discount_amt || "N/A"}
-                                  </span>
-                                  <span className="text-gray-600">
-                                    Discount Percentage: {item.discount_percentage || "N/A"}%
-                                  </span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={5} className="px-4 py-2 text-center text-gray-600">
-                    No orders found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
+    );
+};
 
 export default PurchaseDetails;

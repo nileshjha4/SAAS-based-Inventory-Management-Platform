@@ -1,13 +1,14 @@
 const User = require("../models/users"); // Assuming the model file is named User.js
+const Agent = require('../models/agent')
 
 // Get All Users
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({}).sort({ createdAt: -1 }); // Sort by createdAt in descending order
-    res.status(200).json(users);
+    const users = await User.find({})
+    res.status(200).json({success:true, error:false, users:users});
   } catch (error) {
     console.error("Error fetching users:", error);
-    res.status(500).json({ message: "Failed to fetch users" });
+    res.status(500).json({ success:false, error:true, message: "Failed to fetch users" });
   }
 };
 
@@ -66,8 +67,33 @@ const updateSelectedUser = async (req, res) => {
   }
 };
 
+const addAgent = async(req,res)=>{
+  const { name, agentname, password, number, gender, aadharcard,  pancard } = req.body;
+  if (!name || !agentname || !password || !number || !gender ){
+    return res.status(400).json({ message: "Please fill all fields", success:false, error:true });
+  }
+  try {
+    const agent = new Agent({
+      name: name,
+      agentname: agentname,
+      password: password,
+      number: number,
+      gender : gender,
+      availabilityStatus: 'Available',
+      aadharcard: aadharcard,
+      pancard: pancard,
+    })
+    const savedAgent = await agent.save();
+    res.status(201).json({success:true, error:false, message: "Agent added successfully", agent: savedAgent});
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({success:false, error:true, message:"Server Error"})
+  }
+}
+
 module.exports = {
   getAllUsers,
   searchUsers,
   updateSelectedUser,
-};
+  addAgent
+}

@@ -1,84 +1,36 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import AuthContext from "../AuthContext";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import UpdateUser from "../components/UpdateUser"; // Create an UpdateUser component for user editing
+import { GetUsers } from "../logic/get-users";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 function Users() {
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [updateUser, setUpdateUser] = useState(null);
-  const [users, setAllUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const authContext = useContext(AuthContext);
-  const [updatePage, setUpdatePage] = useState(true);
+  const navigate = useNavigate()
+  const [searchTerm, setSearchterm] = useState('')
+  const [filters, setFilters] = useState({
+    searchTerm : ''
+  })
 
+  const {
+    data: usersData,
+    isLoading: isLoadingUsersData,
+    isError: isErrorUsersData,
+} = useQuery({
+    queryFn: () => GetUsers(filters),
+    queryKey: ["orders", filters],
+    retry: 2,
+});
 
-  useEffect(() => {
-    fetchUsersData();
-  }, [updatePage]);
-  
-  const handlePageUpdate = () => {
-    setUpdatePage(!updatePage);
-  };
-
-  // Fetch all users data
-  const fetchUsersData = () => {
-    fetch(`http://localhost:4000/api/user/get/all`)
-      .then((response) => response.json())
-      .then((data) => {
-        setAllUsers(data);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  // Fetch filtered users data based on search term
-  const fetchSearchData = () => {
-    fetch(`http://localhost:4000/api/user/search?searchTerm=${searchTerm}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setAllUsers(data);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  const handleUpdateUser = (updatedUser) => {
-    fetch(`http://localhost:4000/api/user/update`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedUser),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setUpdatePage(!updatePage);
-        setShowUpdateModal(false);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  const updateUserModalSetting = (selectedUserData) => {
-    console.log("Clicked: edit");
-    setUpdateUser(selectedUserData);
-    console.log(updateUser);
-    setShowUpdateModal(!showUpdateModal);
-    if (showUpdateModal) {
-      handlePageUpdate();
-    }
-  };
-
-  // Handle search term input
-  const handleSearchTerm = (e) => {
-    setSearchTerm(e.target.value);
-    fetchSearchData();
-  };
-
+  if(isLoadingUsersData){
+    return <div>Loading...</div>
+  }
+  if(isErrorUsersData){
+    return <div>Error...</div>
+  }
   return (
     <div className="col-span-12 lg:col-span-10 flex justify-center">
       <div className="flex flex-col gap-5 w-11/12">
-        <div className="bg-white rounded p-3">
-          <span className="font-semibold px-4">User Management</span>
-        </div>
 
         {/* Search and Users Count */}
         <div className="flex justify-between pt-5 pb-3 px-3">
@@ -95,7 +47,7 @@ function Users() {
                 type="text"
                 placeholder="Search by name, email, or shop name"
                 value={searchTerm}
-                onChange={handleSearchTerm}
+                onChange={()=>{}}
               />
             </div>
           </div>
@@ -128,13 +80,13 @@ function Users() {
             </thead>
 
             <tbody className="divide-y divide-gray-200">
-              {users.map((user) => (
+              {usersData?.users?.map((user) => (
                 <tr key={user._id}>
                   <td className="whitespace-nowrap px-4 py-2 text-gray-900">
                     {user.name}
                   </td>
                   <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                    {user.mobile}
+                    {user.number}
                   </td>
                   <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                     {user.email}
@@ -143,17 +95,25 @@ function Users() {
                     {user.shopname || "N/A"}
                   </td>
                   <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                    <Link
-                      to={`/dashboard/orders/${user._id}`}
+                    <button
+                      to={`/orders/${user._id}`}
                       className="text-blue-500 hover:underline"
+                      onClick={()=>{
+                        navigate('/all-orders',{
+                          state: {
+                            id: user?._id,
+                            shopname: user?.shopname
+                          }
+                        })
+                      }}
                     >
                       View Orders
-                    </Link>
+                    </button>
                   </td>
                   <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                     <div className="flex gap-2">
                     <button 
-                      onClick={() => updateUserModalSetting(user)}
+                      onClick={() =>{}}
                     >
                       <FaEdit 
                         color="#5e5e5e"
@@ -161,15 +121,6 @@ function Users() {
                         className="submit-icon"
                       />
                     </button>
-                    {/* <button 
-                      onClick={() => addProductQtyModalSetting(element)}
-                    >
-                      <MdAddBusiness 
-                        color="#5e5e5e"
-                        size="20px"
-                        className="submit-icon"
-                      />
-                    </button> */}
                     </div>
                   </td>
                 </tr>
@@ -177,12 +128,6 @@ function Users() {
             </tbody>
           </table>
         </div>
-        {showUpdateModal && (
-          <UpdateUser
-            updateUserData={updateUser}
-            updateModalSetting={updateUserModalSetting}
-          />
-        )}
       </div>
     </div>
   );

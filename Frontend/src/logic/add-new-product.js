@@ -1,0 +1,22 @@
+export const AddNewProduct=async(data)=>{
+    if(!data){
+        return {success:false, error:true, message: 'Data not present'};
+    }
+    try{
+        const response=await fetch('http://localhost:4000/api/product/add',{
+            method:'POST',
+            headers:{
+                'Content-Type': 'application/json',
+            },
+            body:JSON.stringify(data),
+        })
+        const result=await response.json();
+        if(result?.success){
+            return {success:true, error:false, message:result?.message};
+        }
+        return {success:false, error:true, message:result?.message};
+    }catch(err){
+        console.log(err)
+        return {success:false, error:true, message:err}
+    }
+}

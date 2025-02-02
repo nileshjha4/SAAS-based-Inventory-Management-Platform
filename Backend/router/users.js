@@ -10,4 +10,6 @@ app.get("/get/all", user.getAllUsers);
 
 app.post("/update", user.updateSelectedUser);
 
+app.post('/add-agent', user.addAgent)
+
 module.exports = app;
