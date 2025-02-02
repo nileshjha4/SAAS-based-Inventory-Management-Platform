@@ -2,7 +2,7 @@ export const GetUsers=async(filters)=>{
     console.log(filters)
     const queryParams = new URLSearchParams(filters).toString();
     try{
-        const response = await fetch(`http://localhost:4600/api/user/get/all?${queryParams}`)
+        const response = await fetch(`http://103.160.144.19:4600/api/user/get/all?${queryParams}`)
         const data = await response.json()
         if(data?.error){
             return {success:false, error:true, message: data?.message, users:[]}

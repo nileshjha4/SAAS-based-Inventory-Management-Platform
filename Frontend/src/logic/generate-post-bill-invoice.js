@@ -3,7 +3,7 @@ export const GeneratePostBillInvoice=async(id)=>{
         return {success:false, error:true, message:'No id is present'}
     }
     try {
-        const response = await fetch('http://localhost:4600/api/orders/generate-post-bill-invoice', {
+        const response = await fetch('http://103.160.144.19:4600/api/orders/generate-post-bill-invoice', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -3,7 +3,7 @@ export const GetAdmin=async(token)=>{
         return {message:"Token is required", error:true, success:false};
     }
     try{
-        const response = await fetch('http://localhost:4600/get-admin',{
+        const response = await fetch('http://103.160.144.19:4600/get-admin',{
             method:'GET',
             headers:{
                 'Content-Type': 'application/json',

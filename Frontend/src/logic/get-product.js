@@ -1,7 +1,7 @@
 export const GetProduct=async(searchTerm)=>{
     console.log(searchTerm)
     try{
-        const response = await fetch(`http://localhost:4600/api/product/get/all?searchTerm=${searchTerm}`)
+        const response = await fetch(`http://103.160.144.19:4600/api/product/get/all?searchTerm=${searchTerm}`)
         const data = await response.json()
         if(data?.error){
             console.log(data?.error)

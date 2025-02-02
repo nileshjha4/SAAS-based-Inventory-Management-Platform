@@ -3,7 +3,7 @@ export const UpdateLoadout=async(item)=>{
         return {success:false, error:true, message:"Data is missing"}
     }
     try{
-        const response = await fetch('http://localhost:4600/api/orders/update-loadout',{
+        const response = await fetch('http://103.160.144.19:4600/api/orders/update-loadout',{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

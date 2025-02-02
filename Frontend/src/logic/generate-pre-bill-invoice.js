@@ -4,7 +4,7 @@ export const GeneratePreBillInvoice = async (id) => {
       return { success: false, error: true, message: "Id is not present" };
     }
     try {
-      const response = await fetch('http://localhost:4600/api/orders/generate-pre-bill-invoice', {
+      const response = await fetch('http://103.160.144.19:4600/api/orders/generate-pre-bill-invoice', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

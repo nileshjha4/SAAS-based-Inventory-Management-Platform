@@ -3,7 +3,7 @@ export const DeleteLoadout=async(ids)=>{
         return {message:"id is required", success:false, error:true};
     }
     try{
-        const response = await fetch('http://localhost:4600/api/orders/delete-loadout',{
+        const response = await fetch('http://103.160.144.19:4600/api/orders/delete-loadout',{
             method:'POST',
             headers:{
                 'Content-Type': 'application/json',

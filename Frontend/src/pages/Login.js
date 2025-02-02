@@ -19,7 +19,7 @@ function Login() {
     if (form.username === "" || form.password === "") {
       alert("To login user, enter details to proceed...");
     } else {
-      const repsone = await fetch("http://localhost:4600/login", {
+      const repsone = await fetch("http://103.160.144.19:4600/login", {
         method: "POST",
         headers: {
           "Content-type": "application/json",

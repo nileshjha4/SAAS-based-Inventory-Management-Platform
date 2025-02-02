@@ -1,6 +1,6 @@
 export const GetDispatch=async()=>{
     try{
-        const response = await fetch('http://localhost:4600/api/orders/get-dispatch')
+        const response = await fetch('http://103.160.144.19:4600/api/orders/get-dispatch')
         const data = await response.json()
         if(data?.error){
             return {success:false, error:true, message: data?.message, dispatch:[]}

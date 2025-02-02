@@ -1,6 +1,6 @@
 export const NewAddAgent=async(data)=>{
     try{
-        const response = await fetch(`http://localhost:4600/api/user/add-agent`,{
+        const response = await fetch(`http://103.160.144.19:4600/api/user/add-agent`,{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

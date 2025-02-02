@@ -3,7 +3,7 @@ export const AssignAgent=async(ids)=>{
         return {success:false, error:true, message:"Data missing"}
     }
     try{
-        const response = await fetch('http://localhost:4600/api/orders/assign-agent',{
+        const response = await fetch('http://103.160.144.19:4600/api/orders/assign-agent',{
             method:'POST',
             headers:{
                 'Content-Type': 'application/json',

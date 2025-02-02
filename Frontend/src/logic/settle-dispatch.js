@@ -3,7 +3,7 @@ export const SettleDispatch=async(id, data)=>{
         return {success:false, error:true, message:"Id not present"}
     }
     try{
-        const response=await fetch('http://localhost:4600/api/orders/settle-dispatch', {
+        const response=await fetch('http://103.160.144.19:4600/api/orders/settle-dispatch', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

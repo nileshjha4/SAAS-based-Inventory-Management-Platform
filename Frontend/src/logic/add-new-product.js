@@ -3,7 +3,7 @@ export const AddNewProduct=async(data)=>{
         return {success:false, error:true, message: 'Data not present'};
     }
     try{
-        const response=await fetch('http://localhost:4000/api/product/add',{
+        const response=await fetch('http://103.160.144.19:4000/api/product/add',{
             method:'POST',
             headers:{
                 'Content-Type': 'application/json',

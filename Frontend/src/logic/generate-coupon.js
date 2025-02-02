@@ -3,7 +3,7 @@ export const GenearteCoupon=async(discount)=>{
         return {success:false, error:true, message:"Discount is required"};
       }
       try {
-        const response = await fetch('http://localhost:4600/api/product/generate-coupon', {
+        const response = await fetch('http://103.160.144.19:4600/api/product/generate-coupon', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

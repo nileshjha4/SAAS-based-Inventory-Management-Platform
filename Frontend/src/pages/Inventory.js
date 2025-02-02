@@ -41,8 +41,8 @@ function Inventory() {
   // Delete item
   const deleteItem = (id) => {
     console.log("Product ID: ", id);
-    console.log(`http://localhost:4600/api/product/delete/${id}`);
-    fetch(`http://localhost:4600/api/product/delete/${id}`)
+    console.log(`http://103.160.144.19:4600/api/product/delete/${id}`);
+    fetch(`http://103.160.144.19:4600/api/product/delete/${id}`)
       .then((response) => response.json())
       .then((data) => {
         setUpdatePage(!updatePage);

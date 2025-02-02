@@ -27,7 +27,7 @@ export default function UpdateProduct({
   };
   console.log(updateProductData);
   const updateProduct = () => {
-    fetch("http://localhost:4000/api/product/update", {
+    fetch("http://103.160.144.19:4000/api/product/update", {
       method: "POST",
       headers: {
         "Content-type": "application/json",

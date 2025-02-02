@@ -1,6 +1,6 @@
 export const GetLoadouts=async()=>{
     try{
-        const response = await fetch('http://localhost:4600/api/orders/get-loadout')
+        const response = await fetch('http://103.160.144.19:4600/api/orders/get-loadout')
         const data = await response.json()
         if(data?.error){
             return {success:false, error:true, message: data?.message, loadouts:[]}
