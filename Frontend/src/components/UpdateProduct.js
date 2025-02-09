@@ -1,13 +1,15 @@
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { UpdateGivenProduct } from "../logic/update-product";
 
 export default function UpdateProduct({
   updateProductData,
   updateModalSetting,
   handlePageUpdate
 }) {
-  const { _id, name, manufacturer, description } = updateProductData;
+  const queryClient = useQueryClient()
   const [product, setProduct] = useState({
     productID: updateProductData._id,
     item: updateProductData.item,
@@ -21,26 +23,24 @@ export default function UpdateProduct({
   const [open, setOpen] = useState(true);
   const cancelButtonRef = useRef(null);
 
+  const { mutateAsync: updateProduct } = useMutation({
+    mutationFn: () => UpdateGivenProduct(product),
+    onSuccess: (data) => {
+      if (data?.success) {
+        queryClient.invalidateQueries(["product"]);
+      }
+      alert("Product Updated");
+      updateModalSetting()
+    },
+  });
+
   const handleInputChange = (key, value) => {
     console.log(key);
     setProduct({ ...product, [key]: value });
   };
   console.log(updateProductData);
-  const updateProduct = () => {
-    fetch("http://103.160.144.19:4000/api/product/update", {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(product),
-    })
-      .then((result) => {
-        alert("Product Updated");
-        // setOpen(false);
-        // handlePageUpdate();
-        updateModalSetting();
-      })
-      .catch((err) => console.log(err));
+  const updateGivenProduct = async() => {
+    await updateProduct();
   };
 
   return (
@@ -283,7 +283,7 @@ export default function UpdateProduct({
                   <button
                     type="button"
                     className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
-                    onClick={updateProduct}
+                    onClick={updateGivenProduct}
                   >
                     Update Product
                   </button>

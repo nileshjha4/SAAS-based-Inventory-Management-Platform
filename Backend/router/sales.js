@@ -16,5 +16,5 @@ module.exports = app;
 
 
 
-// http://localhost:4000/api/sales/add POST
-// http://localhost:4000/api/sales/get GET
+// http://103.160.144.19:4600/api/sales/add POST
+// http://103.160.144.19:4600/api/sales/get GET

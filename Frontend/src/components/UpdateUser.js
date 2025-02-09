@@ -38,7 +38,7 @@ export default function UpdateUser({
   console.log(updateUserData);
   const updateUser = () => {
     console.log(user);
-    fetch("http://103.160.144.19:4000/api/user/update", {
+    fetch("http://103.160.144.19:4600/api/user/update", {
       method: "POST",
       headers: {
         "Content-type": "application/json",

@@ -7,9 +7,6 @@ const salesRoute = require("./router/sales");
 const usersRoute = require("./router/users");
 const ordersRoute = require("./router/orders")
 const authRouter = require("./router/auth")
-const userRouter = require('./router/user')
-const depaulRouter = require('./router/depaul')
-const agentRouter = require('./router/agent')
 const cors = require("cors");
 const path = require("path");
 
@@ -48,10 +45,6 @@ app.use("/api/user", usersRoute);
 
 // Order API
 app.use("/api/orders", ordersRoute);
-
-app.use(userRouter)
-app.use(depaulRouter)
-app.use(agentRouter)
 
 app.listen(PORT, HOST, async() => {
   console.log(`Listening on port ${PORT}`);

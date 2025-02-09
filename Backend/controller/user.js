@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
-const User = require('../modal/user')
-const Summary = require('../modal/summary')
+const User = require('../models/user')
+const Summary = require('../models/summary')
 const jwt = require('jsonwebtoken');
 const secret = process.env.SECRET_KEY
 

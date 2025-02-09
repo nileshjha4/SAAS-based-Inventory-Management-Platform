@@ -21,6 +21,6 @@ app.post('/generate-coupon', product.generateCoupon)
 
 app.get('/get-coupon', product.getCoupon)
 
-// http://localhost:4000/api/product/search?searchTerm=fa
+// http://103.160.144.19:4600/api/product/search?searchTerm=fa
 
 module.exports = app;

@@ -12,7 +12,7 @@ function UserOrders() {
 
   // Fetch Orders by User ID
   const fetchOrders = () => {
-    fetch(`http://103.160.144.19:4000/api/orders/user/${userId}`)
+    fetch(`http://103.160.144.19:4600/api/orders/user/${userId}`)
       .then((response) => response.json())
       .then((data) => {
         setOrders(data);

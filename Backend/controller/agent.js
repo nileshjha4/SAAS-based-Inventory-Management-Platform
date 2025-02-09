@@ -1,7 +1,7 @@
-const Agent = require('../modal/agent')
+const Agent = require('../models/agent')
 const jwt = require('jsonwebtoken');
 const secret = process.env.SECRET_KEY
-const Dispatch = require('../modal/dispatch')
+const Dispatch = require('../models/dispatch')
 
 exports.login=(async(req,res,next)=>{
     const {email,password} = req.body;

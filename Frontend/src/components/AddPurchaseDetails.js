@@ -27,7 +27,7 @@ export default function AddPurchaseDetails({
 
   // POST Data
   const addSale = () => {
-    fetch("http://103.160.144.19:4000/api/purchase/add", {
+    fetch("http://103.160.144.19:4600/api/purchase/add", {
       method: "POST",
       headers: {
         "Content-type": "application/json",

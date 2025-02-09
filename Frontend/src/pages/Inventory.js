@@ -133,12 +133,12 @@ function Inventory() {
             handlePageUpdate={handlePageUpdate}
           />
         )}
-        {/* {showUpdateModal && (
+        {showUpdateModal && (
           <UpdateProduct
             updateProductData={updateProduct}
             updateModalSetting={updateProductModalSetting}
           />
-        )} */}
+        )}
 
         {/* Table  */}
         <div className="overflow-x-auto rounded-lg border bg-white border-gray-200 ">
