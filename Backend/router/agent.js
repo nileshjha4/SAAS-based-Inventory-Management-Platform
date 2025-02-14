@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const auth = require('../middleware/userauth')
+const auth = require('../middleware/agentauth')
 const agent = require('../controller/agent')
 
 router.post('/agent/login',agent.login)
