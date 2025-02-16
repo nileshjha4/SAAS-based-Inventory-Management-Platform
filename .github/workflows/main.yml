@@ -23,7 +23,11 @@ jobs:
           node-version: 21
 
       - name: Install PM2 Globally
-        run: npm install -g pm2
+        run: |
+          npm install -g pm2
+          pm2 delete backend || true 
+          pm2 delete frontend || true 
+        
 
       - name: Install Backend Dependencies
         run: |
