@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user')
 const Summary = require('../models/summary')
 const jwt = require('jsonwebtoken');
-const secret = process.env.SECRET_KEY
+const secret = "SUPERSECRETKEY"
 
 exports.addUser=(async(req,res,next)=>{
     console.log("Hit 1")
