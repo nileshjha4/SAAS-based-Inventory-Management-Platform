@@ -5,7 +5,7 @@ function auth(req,res,next){
     if(authHeader == null){
         return res.status(401).json({success:false, error:true, message:'unable to authorize'})
     }
-    const user = jwt.verify(authHeader,process.env.SECRET_KEY)
+    const user = jwt.verify(authHeader,"SUPERSECRETKEY")
     req.user = user
     next()
     }catch(err){
